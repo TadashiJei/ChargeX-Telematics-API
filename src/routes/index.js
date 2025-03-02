@@ -7,6 +7,10 @@ import authRoutes from './auth.routes.js';
 import analyticsRoutes from './analytics.routes.js';
 import batteryRoutes from './battery.routes.js';
 import trackingRoutes from './tracking.routes.js';
+import predictiveRoutes from './predictive.routes.js';
+import blockchainRoutes from './blockchain.routes.js';
+import rivalzRoutes from './rivalz.routes.js';
+import energyTradingRoutes from './energy-trading.routes.js';
 
 const router = express.Router();
 
@@ -22,6 +26,10 @@ router.use(`${API_PREFIX}/auth`, authRoutes);
 router.use(`${API_PREFIX}/analytics`, analyticsRoutes);
 router.use(`${API_PREFIX}/batteries`, batteryRoutes);
 router.use(`${API_PREFIX}/tracking`, trackingRoutes);
+router.use(`${API_PREFIX}/predictive`, predictiveRoutes);
+router.use(`${API_PREFIX}/blockchain`, blockchainRoutes);
+router.use(`${API_PREFIX}/rivalz`, rivalzRoutes);
+router.use(`${API_PREFIX}/energy-trading`, energyTradingRoutes);
 
 // API documentation route
 router.get(`${API_PREFIX}/docs`, (req, res) => {
@@ -36,7 +44,11 @@ router.get(`${API_PREFIX}/docs`, (req, res) => {
       auth: `${API_PREFIX}/auth`,
       analytics: `${API_PREFIX}/analytics`,
       batteries: `${API_PREFIX}/batteries`,
-      tracking: `${API_PREFIX}/tracking`
+      tracking: `${API_PREFIX}/tracking`,
+      predictive: `${API_PREFIX}/predictive`,
+      blockchain: `${API_PREFIX}/blockchain`,
+      rivalz: `${API_PREFIX}/rivalz`,
+      energyTrading: `${API_PREFIX}/energy-trading`
     }
   });
 });
