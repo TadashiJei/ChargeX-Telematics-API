@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChargeX Telematics - Predictive Maintenance</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+  
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/main.css">
+  
+  <!-- Predictive Dashboard CSS -->
+  <link rel="stylesheet" href="css/predictive-dashboard.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="main-header">
+    <div class="container">
+      <div class="logo">
+        <img src="img/logo.svg" alt="ChargeX Logo">
+        <span>ChargeX Telematics</span>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="index.html"><i class="fas fa-home"></i> Dashboard</a></li>
+          <li><a href="devices.html"><i class="fas fa-microchip"></i> Devices</a></li>
+          <li><a href="batteries.html"><i class="fas fa-battery-full"></i> Batteries</a></li>
+          <li><a href="tracking.html"><i class="fas fa-map-marker-alt"></i> Tracking</a></li>
+          <li class="active"><a href="predictive.html"><i class="fas fa-chart-line"></i> Predictive</a></li>
+          <li><a href="alerts.html"><i class="fas fa-bell"></i> Alerts</a></li>
+          <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+      <div class="user-menu">
+        <div class="user-info">
+          <img src="img/avatar.svg" alt="User Avatar">
+          <span>John Doe</span>
+        </div>
+        <div class="dropdown-menu">
+          <ul>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <h1><i class="fas fa-chart-line"></i> Predictive Maintenance</h1>
+        <div class="page-actions">
+          <button class="btn btn-primary"><i class="fas fa-download"></i> Export Report</button>
+        </div>
+      </div>
+      
+      <!-- Predictive Dashboard Container -->
+      <div id="predictive-dashboard"></div>
+      
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="copyright">
+          &copy; 2023 ChargeX Telematics. All rights reserved.
+        </div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="js/main.js"></script>
+  <script src="js/predictive-dashboard.js"></script>
+  <script>
+    // Initialize the predictive dashboard when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Create a new instance of the PredictiveDashboard
+      const dashboard = new PredictiveDashboard('predictive-dashboard', '/api/v1/predictive/test');
+      
+      // For development/demo purposes, we'll simulate a fleet overview response
+      dashboard.fleetOverview = {
+        statusDistribution: {
+          critical: 3,
+          warning: 8,
+          good: 24
+        },
+        maintenanceRequired: 11,
+        totalBatteries: 35,
+        averageRUL: 187,
+        batteryHealthSummary: {
+          criticalBatteries: [
+            { batteryId: 'batt-critical-001', remainingDays: 15, status: 'CRITICAL', nextMaintenanceDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString() },
+            { batteryId: 'batt-critical-002', remainingDays: 22, status: 'CRITICAL', nextMaintenanceDate: new Date(Date.now() + 22 * 24 * 60 * 60 * 1000).toISOString() },
+            { batteryId: 'batt-critical-003', remainingDays: 30, status: 'CRITICAL', nextMaintenanceDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() },
+            { batteryId: 'batt-critical-test', remainingDays: 25, status: 'CRITICAL', nextMaintenanceDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000).toISOString() }
+          ]
+        }
+      };
+      
+      // Render the fleet overview
+      dashboard.renderFleetOverview();
+      
+      // Load batteries
+      dashboard.loadBatteries();
+      
+      // Mock battery details response for demo purposes
+      window.fetchOriginal = window.fetch;
+      window.fetch = function(url) {
+        // Use our real critical test battery endpoints
+        if (url.includes('/api/v1/predictive/test/critical-battery/prediction') || 
+            url.includes('/api/v1/predictive/test/critical-battery/recommendations')) {
+          return window.fetchOriginal(url);
+        }
+        // Mock other battery predictions
+        else if (url.includes('/battery/') && url.includes('/prediction')) {
+          const batteryId = url.split('/battery/')[1].split('/prediction')[0];
+          
+          // Create a mock response
+          return Promise.resolve({
+            json: () => Promise.resolve({
+              success: true,
+              prediction: {
+                batteryId: batteryId,
+                remainingUsefulLife: {
+                  days: Math.floor(Math.random() * 300) + 15,
+                  confidence: Math.floor(Math.random() * 20) + 80,
+                  status: ['CRITICAL', 'WARNING', 'GOOD'][Math.floor(Math.random() * 3)]
+                },
+                batteryHealth: {
+                  soh: Math.floor(Math.random() * 30) + 70,
+                  cycleCount: Math.floor(Math.random() * 500) + 100,
+                  temperature: Math.floor(Math.random() * 15) + 20
+                },
+                nextMaintenanceDate: new Date(Date.now() + (Math.floor(Math.random() * 300) + 15) * 24 * 60 * 60 * 1000).toISOString()
+              }
+            })
+          });
+        } else if (url.includes('/battery/') && url.includes('/recommendations')) {
+          const batteryId = url.split('/battery/')[1].split('/recommendations')[0];
+          
+          // Create a mock response
+          return Promise.resolve({
+            json: () => Promise.resolve({
+              success: true,
+              recommendations: [
+                {
+                  priority: ['HIGH', 'MEDIUM', 'LOW'][Math.floor(Math.random() * 3)],
+                  action: 'Replace Battery Cell',
+                  description: 'Cell #3 is showing signs of degradation. Replace it to prevent further capacity loss.',
+                  deadline: new Date(Date.now() + (Math.floor(Math.random() * 30) + 5) * 24 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                  priority: ['HIGH', 'MEDIUM', 'LOW'][Math.floor(Math.random() * 3)],
+                  action: 'Perform Calibration',
+                  description: 'Battery management system needs recalibration to improve accuracy of charge level reporting.',
+                  deadline: new Date(Date.now() + (Math.floor(Math.random() * 30) + 5) * 24 * 60 * 60 * 1000).toISOString()
+                },
+                {
+                  priority: ['HIGH', 'MEDIUM', 'LOW'][Math.floor(Math.random() * 3)],
+                  action: 'Check Cooling System',
+                  description: 'Temperature fluctuations detected. Inspect cooling system for potential issues.',
+                  deadline: new Date(Date.now() + (Math.floor(Math.random() * 30) + 5) * 24 * 60 * 60 * 1000).toISOString()
+                }
+              ]
+            })
+          });
+        } else if (url.includes('/fleet/overview')) {
+          // Create a mock response
+          return Promise.resolve({
+            json: () => Promise.resolve({
+              success: true,
+              fleetOverview: dashboard.fleetOverview
+            })
+          });
+        }
+        
+        // Pass through to original fetch for other requests
+        return window.fetchOriginal(url);
+      };
+    });
+  </script>
+</body>
+</html>

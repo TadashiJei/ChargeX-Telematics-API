@@ -1,0 +1,34 @@
+[
+  {
+    "id": "42ec67a7-490d-42d7-a726-7a1287d502a9",
+    "sellerId": "user-001",
+    "batteryId": "battery-001",
+    "energyAmount": 5,
+    "pricePerKwh": 0.15,
+    "location": {
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    },
+    "availableFrom": "2025-03-02T08:35:40.552Z",
+    "availableTo": "2025-03-03T08:35:40.544Z",
+    "status": "active",
+    "createdAt": "2025-03-02T08:35:40.552Z",
+    "updatedAt": "2025-03-02T08:35:40.552Z"
+  },
+  {
+    "id": "119dd387-fb53-499e-b701-5a71bd0edc6f",
+    "sellerId": "user-001",
+    "batteryId": "battery-001",
+    "energyAmount": 3,
+    "pricePerKwh": 0.15,
+    "location": {
+      "latitude": 37.7749,
+      "longitude": -122.4194
+    },
+    "availableFrom": "2025-03-02T08:36:53.421Z",
+    "availableTo": "2025-03-03T08:36:53.420Z",
+    "status": "sold",
+    "createdAt": "2025-03-02T08:36:53.421Z",
+    "updatedAt": "2025-03-02T08:36:53.424Z"
+  }
+]

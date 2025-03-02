@@ -155,24 +155,77 @@ The ChargeX Telematics system includes advanced battery tracking and geofencing 
    - Color-coded status indicators
    - Historical movement playback
 
-## Blockchain Integration
+## AI-Powered Predictive Maintenance
 
-The telematics system integrates with the ChargeX blockchain platform through:
+The ChargeX Telematics system features advanced predictive maintenance capabilities using artificial intelligence:
 
-1. **Smart Contract Triggers**
-   - Automatic lease termination on battery health thresholds
-   - Usage-based billing calculations
-   - Maintenance request initiation
+1. **LSTM-Based Prediction Model**
+   - Deep learning model trained on historical battery telemetry data
+   - Accurate prediction of Remaining Useful Life (RUL) for batteries
+   - Early detection of potential battery failures
+   - Confidence scoring for all predictions
 
-2. **Data Verification**
-   - Cryptographic signing of telemetry data
-   - Immutable record of battery lifecycle
-   - Verification of lease compliance
+2. **Maintenance Recommendations**
+   - Automated maintenance scheduling based on predicted battery health
+   - Prioritized maintenance actions with deadlines
+   - Customized recommendations based on battery usage patterns
+   - Cost-effective maintenance planning
 
-3. **Token Economy**
-   - Energy trading based on battery capacity
-   - Rewards for optimal battery usage patterns
-   - Penalties for lease violations
+3. **Fleet Health Management**
+   - Fleet-wide battery health monitoring dashboard
+   - Status distribution visualization (critical, warning, good)
+   - Average fleet RUL tracking
+   - Identification of batteries requiring immediate attention
+
+## Rivalz.ai RAG Integration
+
+The ChargeX Telematics system integrates with Rivalz.ai to provide advanced Retrieval Augmented Generation (RAG) capabilities for battery telemetry data. This allows users to query telemetry data using natural language and get AI-powered insights.
+
+Key features:
+- Knowledge base creation from device telemetry data
+- Natural language querying of telemetry information
+- PDF generation for data vectorization
+- Conversation tracking and follow-up questions support
+- Decentralized P2P storage for enhanced data availability and ownership
+
+To use this feature, configure the following environment variables:
+```
+RIVALZ_ENABLED=true
+RIVALZ_SECRET_TOKEN=your_rivalz_secret_token
+```
+
+See the [Rivalz Integration Documentation](./docs/rivalz-integration.md) for more details.
+
+## Rivalz.ai Decentralized Storage Integration
+
+The ChargeX Telematics system integrates with Rivalz.ai decentralized storage for advanced vector storage of telemetry data.
+
+Key features:
+- **Decentralized Storage**: Utilizes peer-to-peer network for resilient data storage
+- **Vector Database**: Enables semantic search and natural language querying
+- **End-to-End Encryption**: Ensures data privacy and security
+- **High Availability**: Data remains accessible even during network disruptions
+- **Cost-Effective Solution**: Lower storage costs compared to traditional cloud solutions
+
+## Peer-to-Peer Energy Trading
+
+The ChargeX Telematics system now includes a comprehensive peer-to-peer energy trading platform that allows battery owners to sell excess energy to other users in the network.
+
+Key features:
+- **Energy Marketplace**: Create and browse energy offers from other users
+- **Geolocation-Based Matching**: Find nearby energy offers based on location
+- **Flexible Pricing**: Set your own price per kWh for energy sales
+- **Secure Transactions**: Complete transaction tracking and verification
+- **Real-Time Statistics**: Monitor trading activity and market trends
+- **Partial Purchases**: Buy only the amount of energy you need
+- **Trade Management**: Track the status of your trades from creation to completion
+
+To use this feature, configure the following environment variables:
+```
+ENABLE_ENERGY_TRADING=true
+ENERGY_TRADING_MIN_PRICE=0.05
+ENERGY_TRADING_MAX_DISTANCE=50
+```
 
 ## Setup Instructions
 
@@ -218,6 +271,8 @@ The telematics system integrates with the ChargeX blockchain platform through:
    - Configure the `.env` file with appropriate settings
    - Set `ENABLE_GEOFENCING=true` to enable geofencing features
    - Use `USE_MOCK_DATA=true` during development for testing
+   - Set `RIVALZ_ENABLED=true` to enable Rivalz.ai decentralized storage
+   - Configure `RIVALZ_SECRET_TOKEN` with your Rivalz.ai API token
 
 4. **Testing**
    - Run unit tests: `npm test`
@@ -243,6 +298,49 @@ The telematics system exposes RESTful APIs for integration:
 - `GET /api/v1/tracking/geofences/{id}/batteries` - Get batteries within a specific geofence
 - `GET /api/v1/tracking/geofence-violations` - Get batteries outside their assigned geofences
 
+### Predictive Maintenance
+- `GET /api/v1/predictive/battery/{batteryId}/prediction` - Get RUL prediction for a specific battery
+- `GET /api/v1/predictive/battery/{batteryId}/recommendations` - Get maintenance recommendations for a specific battery
+- `GET /api/v1/predictive/fleet/overview` - Get fleet-wide maintenance overview
+- `GET /api/v1/predictive/health` - Health check for predictive maintenance service
+
+### Rivalz.ai RAG Integration
+- `POST /api/v1/rivalz/device/{deviceId}/knowledge-base` - Create a knowledge base from device telemetry data
+- `GET /api/v1/rivalz/knowledge-base/{knowledgeBaseId}` - Get knowledge base status and information
+- `POST /api/v1/rivalz/knowledge-base/{knowledgeBaseId}/query` - Query a knowledge base with natural language
+- `GET /api/v1/rivalz/knowledge-base/{knowledgeBaseId}/conversations` - Retrieve conversation history
+
+### Rivalz.ai Decentralized Storage Integration
+- `POST /api/v1/rivalz/telemetry/{deviceId}` - Process telemetry data and store in decentralized storage
+- `GET /api/v1/rivalz/knowledge-base/{knowledgeBaseId}` - Get knowledge base status and information
+- `POST /api/v1/rivalz/knowledge-base/{knowledgeBaseId}/query` - Query a knowledge base with natural language
+- `DELETE /api/v1/rivalz/knowledge-base/{knowledgeBaseId}` - Delete a knowledge base
+
+### Peer-to-Peer Energy Trading
+- `POST /api/v1/energy-trading/offers` - Create a new energy offer
+- `GET /api/v1/energy-trading/offers` - Retrieve all energy offers
+- `GET /api/v1/energy-trading/offers/{id}` - Get details of a specific energy offer
+- `PUT /api/v1/energy-trading/offers/{id}` - Update an existing energy offer
+- `DELETE /api/v1/energy-trading/offers/{id}` - Delete an energy offer
+- `POST /api/v1/energy-trading/trades` - Create a new trade
+- `GET /api/v1/energy-trading/trades` - Retrieve all trades
+- `GET /api/v1/energy-trading/trades/{id}` - Get details of a specific trade
+- `PUT /api/v1/energy-trading/trades/{id}` - Update an existing trade
+- `DELETE /api/v1/energy-trading/trades/{id}` - Delete a trade
+
+## Data Storage
+
+The ChargeX Telematics system uses a combination of storage solutions:
+
+1. **MongoDB**: Primary database for telemetry data, device configurations, and user settings
+2. **Redis**: Caching layer for frequently accessed data and real-time tracking information
+3. **Rivalz.ai Decentralized Storage**: Advanced vector storage for telemetry data with the following benefits:
+   - **Decentralized Storage**: Utilizes peer-to-peer network for resilient data storage
+   - **Vector Database**: Enables semantic search and natural language querying
+   - **End-to-End Encryption**: Ensures data privacy and security
+   - **High Availability**: Data remains accessible even during network disruptions
+   - **Cost-Effective Solution**: Lower storage costs compared to traditional cloud solutions
+
 ## Security Considerations
 
 - End-to-end encryption for all data transmission
@@ -253,12 +351,15 @@ The telematics system exposes RESTful APIs for integration:
 
 ## Development Roadmap
 
+The ChargeX Telematics system is being developed in phases:
+
 - **Phase 1**: Basic telemetry and GPS tracking ✅
-- **Phase 2**: Battery tracking and geofencing capabilities ✅
-- **Phase 3**: Blockchain integration and smart contract execution
-- **Phase 4**: AI-powered predictive maintenance
-- **Phase 5**: Peer-to-peer energy trading capabilities
-- **Phase 6**: Advanced battery swapping automation
+- **Phase 2**: Battery tracking and geofencing ✅
+- **Phase 3**: Blockchain integration and smart contract execution ✅
+- **Phase 4**: AI-powered predictive maintenance ✅
+- **Phase 5**: Rivalz.ai RAG integration for intelligent data querying ✅
+- **Phase 6**: Peer-to-peer energy trading capabilities ✅
+- **Phase 7**: Advanced battery swapping automation
 
 ## License
 

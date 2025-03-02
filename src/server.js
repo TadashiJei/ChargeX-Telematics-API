@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import { rateLimit } from 'express-rate-limit';
 import routes from './routes/index.js';
+import testRoutes from './routes/test-routes.js';
 import logger from './utils/logger.js';
 import { initMqttClient } from './services/mqtt.service.js';
 import { initBlockchainListener } from './services/blockchain.service.js';
@@ -14,6 +15,12 @@ import { initScheduledTasks } from './services/scheduler.service.js';
 import { setupRedisClient } from './services/cache.service.js';
 import { initInfluxDB } from './services/timeseries.service.js';
 import errorHandler from './middleware/error.middleware.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get directory paths
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Initialize Express app
 const app = express();
@@ -37,6 +44,14 @@ app.use(cors({
   credentials: true
 }));
 
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve Rivalz demo page
+app.get('/rivalz-demo', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/rivalz-demo.html'));
+});
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
@@ -53,6 +68,68 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // API routes
 app.use('/api', routes);
+
+// Test routes (development only)
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/v1', testRoutes);
+  
+  // Direct test routes for critical battery
+  app.get('/api/v1/predictive/test/critical-battery/prediction', (req, res) => {
+    console.log('Direct route: Returning critical test data for battery prediction');
+    res.json({
+      success: true,
+      prediction: {
+        batteryId: 'batt-critical-test',
+        remainingUsefulLife: {
+          days: 25,
+          status: 'CRITICAL',
+          confidence: 95
+        },
+        batteryHealth: {
+          soh: 72.5,
+          cycleCount: 550,
+          temperature: 38.2
+        },
+        timestamp: new Date().toISOString(),
+        nextMaintenanceDate: new Date(Date.now() + (25 * 24 * 60 * 60 * 1000)).toISOString()
+      }
+    });
+  });
+  
+  app.get('/api/v1/predictive/test/critical-battery/recommendations', (req, res) => {
+    console.log('Direct route: Returning critical test data for battery recommendations');
+    res.json({
+      success: true,
+      batteryId: 'batt-critical-test',
+      recommendations: [
+        {
+          priority: 'HIGH',
+          action: 'REPLACE',
+          description: 'Battery replacement recommended within 30 days',
+          deadline: new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString()
+        },
+        {
+          priority: 'MEDIUM',
+          action: 'COOLING',
+          description: 'Battery temperature is high. Improve cooling or reduce load.',
+          deadline: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString()
+        },
+        {
+          priority: 'MEDIUM',
+          action: 'MONITOR',
+          description: 'Battery health below 80%. Increase monitoring frequency.',
+          deadline: new Date(Date.now() + (14 * 24 * 60 * 60 * 1000)).toISOString()
+        }
+      ],
+      prediction: {
+        days: 25,
+        status: 'CRITICAL',
+        confidence: 95
+      },
+      timestamp: new Date().toISOString()
+    });
+  });
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {

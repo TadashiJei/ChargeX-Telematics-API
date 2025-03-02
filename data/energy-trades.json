@@ -1,0 +1,26 @@
+[
+  {
+    "id": "d26af163-18c7-4830-ba07-8ab9695f3b9a",
+    "offerId": "119dd387-fb53-499e-b701-5a71bd0edc6f",
+    "buyerId": "user-002",
+    "sellerId": "user-001",
+    "energyAmount": 2,
+    "pricePerKwh": 0.15,
+    "totalPrice": 0.3,
+    "status": "accepted",
+    "createdAt": "2025-03-02T08:36:53.422Z",
+    "updatedAt": "2025-03-02T08:36:53.423Z"
+  },
+  {
+    "id": "8e69139c-253f-4c98-b21b-f8055c3a4c8c",
+    "offerId": "119dd387-fb53-499e-b701-5a71bd0edc6f",
+    "buyerId": "user-002",
+    "sellerId": "user-001",
+    "energyAmount": 3,
+    "pricePerKwh": 0.15,
+    "totalPrice": 0.44999999999999996,
+    "status": "accepted",
+    "createdAt": "2025-03-02T08:36:53.423Z",
+    "updatedAt": "2025-03-02T08:36:53.424Z"
+  }
+]

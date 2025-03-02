@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .btn {
+      padding: 8px 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Predictive Maintenance API Test</h1>
+    
+    <div>
+      <h2>Fleet Overview</h2>
+      <button id="get-fleet-overview" class="btn">Get Fleet Overview</button>
+      <pre id="fleet-overview-result"></pre>
+    </div>
+    
+    <div>
+      <h2>Battery Prediction</h2>
+      <input type="text" id="battery-id" placeholder="Battery ID" value="batt-001">
+      <button id="get-battery-prediction" class="btn">Get Battery Prediction</button>
+      <pre id="battery-prediction-result"></pre>
+    </div>
+    
+    <div>
+      <h2>Battery Recommendations</h2>
+      <input type="text" id="battery-id-rec" placeholder="Battery ID" value="batt-001">
+      <button id="get-battery-recommendations" class="btn">Get Battery Recommendations</button>
+      <pre id="battery-recommendations-result"></pre>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('get-fleet-overview').addEventListener('click', async () => {
+      const resultElement = document.getElementById('fleet-overview-result');
+      resultElement.textContent = 'Loading...';
+      
+      try {
+        const response = await fetch('/api/v1/predictive/test/fleet/overview');
+        const data = await response.json();
+        resultElement.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    });
+    
+    document.getElementById('get-battery-prediction').addEventListener('click', async () => {
+      const batteryId = document.getElementById('battery-id').value;
+      const resultElement = document.getElementById('battery-prediction-result');
+      resultElement.textContent = 'Loading...';
+      
+      try {
+        const response = await fetch(`/api/v1/predictive/test/battery/${batteryId}/prediction`);
+        const data = await response.json();
+        resultElement.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    });
+    
+    document.getElementById('get-battery-recommendations').addEventListener('click', async () => {
+      const batteryId = document.getElementById('battery-id-rec').value;
+      const resultElement = document.getElementById('battery-recommendations-result');
+      resultElement.textContent = 'Loading...';
+      
+      try {
+        const response = await fetch(`/api/v1/predictive/test/battery/${batteryId}/recommendations`);
+        const data = await response.json();
+        resultElement.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        resultElement.textContent = `Error: ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
