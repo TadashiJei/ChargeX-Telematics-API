@@ -268,28 +268,59 @@ if [ "$ENABLE_SSL" = true ]; then
     
     echo "Obtaining SSL certificates..."
     echo -e "${YELLOW}Note: This will only work if your domain is properly configured to point to this server.${NC}"
-    echo -e "${YELLOW}If you're testing, you may want to use the --staging flag with certbot.${NC}"
     
-    echo -e "${YELLOW}SSL setup requires an email address for certificate renewal notifications.${NC}"
-    read -p "Enter your email address (or type 'skip' to skip SSL setup): " EMAIL_ADDRESS
+    # Email collection with validation
+    echo -e "${YELLOW}SSL setup requires a valid email address for certificate renewal notifications.${NC}"
     
-    if [[ "$EMAIL_ADDRESS" == "skip" ]]; then
-        echo -e "${YELLOW}SSL setup skipped. You can run certbot manually later.${NC}"
-    else
-        if [[ "$EMAIL_ADDRESS" == "" ]]; then
-            echo -e "${YELLOW}No email provided. Using --register-unsafely-without-email option.${NC}"
-            echo -e "${YELLOW}WARNING: This is not recommended for production use.${NC}"
-            $SUDO certbot --nginx --register-unsafely-without-email --agree-tos -d $APP_DOMAIN -d $DOCS_DOMAIN || {
-                echo -e "${YELLOW}SSL setup failed. Continuing without SSL.${NC}"
-                # Don't exit on SSL failure, just continue
-            }
+    # Function to validate email format
+    validate_email() {
+        local email=$1
+        if [[ $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
+            return 0
         else
-            $SUDO certbot --nginx --email "$EMAIL_ADDRESS" --agree-tos -d $APP_DOMAIN -d $DOCS_DOMAIN || {
-                echo -e "${YELLOW}SSL setup failed. Continuing without SSL.${NC}"
-                # Don't exit on SSL failure, just continue
-            }
+            return 1
         fi
-    fi
+    }
+    
+    # Default email (you can change this)
+    DEFAULT_EMAIL="admin@chargex-telematics.com"
+    
+    # Keep asking until we get a valid email or user decides to skip
+    while true; do
+        read -p "Enter your email address [default: $DEFAULT_EMAIL] (or type 'skip' to skip SSL setup): " EMAIL_ADDRESS
+        
+        # Handle skip option
+        if [[ "$EMAIL_ADDRESS" == "skip" ]]; then
+            echo -e "${YELLOW}SSL setup skipped. You can run certbot manually later.${NC}"
+            break
+        fi
+        
+        # Use default if empty
+        if [[ -z "$EMAIL_ADDRESS" ]]; then
+            EMAIL_ADDRESS="$DEFAULT_EMAIL"
+            echo -e "${YELLOW}Using default email: $EMAIL_ADDRESS${NC}"
+        fi
+        
+        # Validate email format
+        if validate_email "$EMAIL_ADDRESS"; then
+            echo -e "${GREEN}Email address is valid.${NC}"
+            
+            # Confirm with user
+            read -p "Proceed with SSL setup using $EMAIL_ADDRESS? (y/n): " CONFIRM
+            if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
+                echo "Setting up SSL certificates..."
+                $SUDO certbot --nginx --email "$EMAIL_ADDRESS" --agree-tos -d $APP_DOMAIN -d $DOCS_DOMAIN || {
+                    echo -e "${YELLOW}SSL setup failed. Continuing without SSL.${NC}"
+                    # Don't exit on SSL failure, just continue
+                }
+                break
+            else
+                echo "Let's try again."
+            fi
+        else
+            echo -e "\033[0;31mInvalid email format. Please enter a valid email address.${NC}"
+        fi
+    done
 fi
 
 # 9. Configure firewall
