@@ -1,0 +1,1441 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ChargeX Telematics API",
+    "description": "API documentation for the ChargeX Telematics system, providing comprehensive battery tracking, monitoring, and management capabilities.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ChargeX Development Team",
+      "email": "dev@chargex.io"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "ChargeX Telematics API v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tracking",
+      "description": "Battery tracking and geofencing operations"
+    },
+    {
+      "name": "Energy Trading",
+      "description": "Peer-to-peer energy trading operations"
+    },
+    {
+      "name": "Predictive Maintenance",
+      "description": "AI-powered battery health prediction and maintenance recommendations"
+    },
+    {
+      "name": "Telemetry",
+      "description": "Battery telemetry data operations"
+    },
+    {
+      "name": "Devices",
+      "description": "Device management operations"
+    },
+    {
+      "name": "Alerts",
+      "description": "Battery and system alert management"
+    },
+    {
+      "name": "Blockchain",
+      "description": "Blockchain integration for device registration and telemetry logging"
+    },
+    {
+      "name": "Authentication",
+      "description": "User and device authentication endpoints"
+    },
+    {
+      "name": "Rivalz.ai",
+      "description": "Rivalz.ai RAG integration for telemetry data"
+    }
+  ],
+  "paths": {
+    "/tracking/geofences": {
+      "get": {
+        "tags": ["Tracking"],
+        "summary": "Get all geofences",
+        "description": "Retrieves all geofences defined in the system",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Geofence"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tracking/geofences/{geofenceId}": {
+      "get": {
+        "tags": ["Tracking"],
+        "summary": "Get a specific geofence",
+        "description": "Retrieves a specific geofence by ID",
+        "parameters": [
+          {
+            "name": "geofenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the geofence to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Geofence"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tracking/geofences/{geofenceId}/batteries": {
+      "get": {
+        "tags": ["Tracking"],
+        "summary": "Get batteries within a geofence",
+        "description": "Retrieves all batteries located within a specific geofence",
+        "parameters": [
+          {
+            "name": "geofenceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the geofence"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Battery"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tracking/geofence-violations": {
+      "get": {
+        "tags": ["Tracking"],
+        "summary": "Get geofence violations",
+        "description": "Retrieves all batteries that are outside their assigned geofences",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/GeofenceViolation"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/energy-trading/offers": {
+      "get": {
+        "tags": ["Energy Trading"],
+        "summary": "Get all energy offers",
+        "description": "Retrieves all available energy offers",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EnergyOffer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Energy Trading"],
+        "summary": "Create a new energy offer",
+        "description": "Creates a new energy offer for peer-to-peer trading",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnergyOfferInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Offer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/EnergyOffer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predictive/battery/{batteryId}/prediction": {
+      "get": {
+        "tags": ["Predictive Maintenance"],
+        "summary": "Get battery prediction",
+        "description": "Retrieves the remaining useful life prediction for a specific battery",
+        "parameters": [
+          {
+            "name": "batteryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the battery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "prediction": {
+                      "$ref": "#/components/schemas/BatteryPrediction"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predictive/battery/{batteryId}/recommendations": {
+      "get": {
+        "tags": ["Predictive Maintenance"],
+        "summary": "Get battery recommendations",
+        "description": "Retrieves maintenance recommendations for a specific battery",
+        "parameters": [
+          {
+            "name": "batteryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the battery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "batteryId": {
+                      "type": "string",
+                      "example": "batt-critical-test"
+                    },
+                    "recommendations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/BatteryRecommendation"
+                      }
+                    },
+                    "prediction": {
+                      "type": "object",
+                      "properties": {
+                        "days": {
+                          "type": "integer",
+                          "example": 25
+                        },
+                        "status": {
+                          "type": "string",
+                          "example": "CRITICAL"
+                        },
+                        "confidence": {
+                          "type": "integer",
+                          "example": 95
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rivalz/device/{deviceId}/knowledge-base": {
+      "post": {
+        "tags": ["Rivalz.ai"],
+        "summary": "Create a knowledge base",
+        "description": "Creates a knowledge base from device telemetry data",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the device"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Knowledge base created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "knowledgeBaseId": {
+                      "type": "string",
+                      "example": "kb-16030a76-87c3-41f5-84f0-60792e7921fd"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telemetry/submit": {
+      "post": {
+        "tags": ["Telemetry"],
+        "summary": "Submit telemetry data",
+        "description": "Submits telemetry data for a device",
+        "security": [
+          {
+            "deviceAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deviceId": {
+                    "type": "string",
+                    "example": "device-001"
+                  },
+                  "batteryId": {
+                    "type": "string",
+                    "example": "battery-001"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "metrics": {
+                    "type": "object",
+                    "properties": {
+                      "voltage": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 12.6
+                      },
+                      "current": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2.5
+                      },
+                      "temperature": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 25.3
+                      },
+                      "stateOfCharge": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 85.2
+                      },
+                      "location": {
+                        "type": "object",
+                        "properties": {
+                          "latitude": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 37.7749
+                          },
+                          "longitude": {
+                            "type": "number",
+                            "format": "float",
+                            "example": -122.4194
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["deviceId", "timestamp", "metrics"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Telemetry data submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "id": {
+                      "type": "string",
+                      "example": "telemetry-123456"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/telemetry/{deviceId}": {
+      "get": {
+        "tags": ["Telemetry"],
+        "summary": "Get telemetry data",
+        "description": "Retrieves telemetry data for a specific device",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID of the device"
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Start time for telemetry data retrieval"
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "End time for telemetry data retrieval"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "description": "Maximum number of records to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 10
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "deviceId": {
+                            "type": "string",
+                            "example": "device-001"
+                          },
+                          "timestamp": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "metrics": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices": {
+      "get": {
+        "tags": ["Devices"],
+        "summary": "Get all devices",
+        "description": "Retrieves all devices registered in the system",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Device"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Devices"],
+        "summary": "Register a new device",
+        "description": "Registers a new device in the system",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Device registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Device"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/alerts": {
+      "get": {
+        "tags": ["Alerts"],
+        "summary": "Get all alerts",
+        "description": "Retrieves all alerts in the system",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["active", "acknowledged", "resolved"]
+            },
+            "description": "Filter alerts by status"
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["critical", "warning", "info"]
+            },
+            "description": "Filter alerts by severity"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["battery", "geofence", "system"]
+            },
+            "description": "Filter alerts by type"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Alert"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blockchain/register-device": {
+      "post": {
+        "tags": ["Blockchain"],
+        "summary": "Register device on blockchain",
+        "description": "Registers a device on the blockchain network",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "deviceId": {
+                    "type": "string",
+                    "example": "device-001"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "manufacturer": {
+                        "type": "string",
+                        "example": "ChargeX"
+                      },
+                      "model": {
+                        "type": "string",
+                        "example": "CX-2025"
+                      },
+                      "serialNumber": {
+                        "type": "string",
+                        "example": "CX2025-001"
+                      }
+                    }
+                  }
+                },
+                "required": ["deviceId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Device registered on blockchain successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "transactionId": {
+                      "type": "string",
+                      "example": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+                    },
+                    "blockNumber": {
+                      "type": "integer",
+                      "example": 12345
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticates a user and returns a JWT token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password123"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "token": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "refreshToken": {
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "user-001"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "user@example.com"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "admin"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BatteryPrediction": {
+        "type": "object",
+        "properties": {
+          "batteryId": {
+            "type": "string",
+            "example": "battery-001"
+          },
+          "remainingUsefulLife": {
+            "type": "number",
+            "format": "float",
+            "example": 85.5
+          },
+          "predictedFailureDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confidenceScore": {
+            "type": "number",
+            "format": "float",
+            "example": 0.92
+          }
+        }
+      },
+      "MaintenanceRecommendation": {
+        "type": "object",
+        "properties": {
+          "batteryId": {
+            "type": "string",
+            "example": "battery-001"
+          },
+          "recommendationType": {
+            "type": "string",
+            "enum": ["inspection", "replacement", "optimization"],
+            "example": "inspection"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "example": "medium"
+          },
+          "description": {
+            "type": "string",
+            "example": "Battery shows signs of decreased capacity. Schedule an inspection within 2 weeks."
+          },
+          "estimatedCost": {
+            "type": "number",
+            "format": "float",
+            "example": 150.0
+          },
+          "recommendedDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "device-001"
+          },
+          "name": {
+            "type": "string",
+            "example": "ChargeX Station 1"
+          },
+          "type": {
+            "type": "string",
+            "example": "charging_station"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "maintenance"],
+            "example": "active"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              },
+              "address": {
+                "type": "string",
+                "example": "123 Main St, San Francisco, CA 94105"
+              }
+            }
+          },
+          "batteryIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["battery-001", "battery-002"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DeviceInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "ChargeX Station 1"
+          },
+          "type": {
+            "type": "string",
+            "example": "charging_station"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              },
+              "address": {
+                "type": "string",
+                "example": "123 Main St, San Francisco, CA 94105"
+              }
+            }
+          },
+          "batteryIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["battery-001", "battery-002"]
+          }
+        },
+        "required": ["name", "type", "location"]
+      },
+      "Alert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "alert-001"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["battery", "geofence", "system"],
+            "example": "battery"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "warning", "info"],
+            "example": "warning"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "acknowledged", "resolved"],
+            "example": "active"
+          },
+          "message": {
+            "type": "string",
+            "example": "Battery temperature exceeds normal operating range"
+          },
+          "deviceId": {
+            "type": "string",
+            "example": "device-001"
+          },
+          "batteryId": {
+            "type": "string",
+            "example": "battery-001"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "temperature": {
+                "type": "number",
+                "format": "float",
+                "example": 45.2
+              },
+              "threshold": {
+                "type": "number",
+                "format": "float",
+                "example": 40.0
+              }
+            }
+          }
+        }
+      },
+      "Geofence": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "geo-001"
+          },
+          "name": {
+            "type": "string",
+            "example": "San Francisco Office"
+          },
+          "type": {
+            "type": "string",
+            "example": "circle"
+          },
+          "center": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              }
+            }
+          },
+          "radius": {
+            "type": "number",
+            "format": "float",
+            "example": 500
+          },
+          "batteryIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["batt-001", "batt-002"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Battery": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "batt-001"
+          },
+          "serialNumber": {
+            "type": "string",
+            "example": "BT-2025-001"
+          },
+          "model": {
+            "type": "string",
+            "example": "LiFePO4-100Ah"
+          },
+          "capacity": {
+            "type": "number",
+            "format": "float",
+            "example": 100
+          },
+          "manufacturer": {
+            "type": "string",
+            "example": "ChargeX"
+          },
+          "manufactureDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "health": {
+            "type": "number",
+            "format": "float",
+            "example": 97.2
+          },
+          "lastCharged": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              }
+            }
+          },
+          "lastSeen": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GeofenceViolation": {
+        "type": "object",
+        "properties": {
+          "batteryId": {
+            "type": "string",
+            "example": "batt-002"
+          },
+          "batteryName": {
+            "type": "string",
+            "example": "BT-2025-002"
+          },
+          "geofenceId": {
+            "type": "string",
+            "example": "geo-001"
+          },
+          "geofenceName": {
+            "type": "string",
+            "example": "San Francisco Office"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7833
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4167
+              }
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "distance": {
+            "type": "number",
+            "format": "float",
+            "example": 963.71
+          }
+        }
+      },
+      "EnergyOffer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "offer-123456"
+          },
+          "sellerId": {
+            "type": "string",
+            "example": "user-001"
+          },
+          "batteryId": {
+            "type": "string",
+            "example": "battery-001"
+          },
+          "energyAmount": {
+            "type": "number",
+            "format": "float",
+            "example": 5.0
+          },
+          "pricePerKwh": {
+            "type": "number",
+            "format": "float",
+            "example": 0.15
+          },
+          "totalValue": {
+            "type": "number",
+            "format": "float",
+            "example": 0.75
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "pending", "sold", "expired", "cancelled"],
+            "example": "active"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "availableTo": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EnergyOfferInput": {
+        "type": "object",
+        "properties": {
+          "sellerId": {
+            "type": "string",
+            "example": "user-001"
+          },
+          "batteryId": {
+            "type": "string",
+            "example": "battery-001"
+          },
+          "energyAmount": {
+            "type": "number",
+            "format": "float",
+            "example": 5.0
+          },
+          "pricePerKwh": {
+            "type": "number",
+            "format": "float",
+            "example": 0.15
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number",
+                "format": "float",
+                "example": 37.7749
+              },
+              "longitude": {
+                "type": "number",
+                "format": "float",
+                "example": -122.4194
+              }
+            }
+          },
+          "availableTo": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["sellerId", "batteryId", "energyAmount", "pricePerKwh", "location"]
+      },
+      "EnergyTradeDetails": {
+        "type": "object",
+        "properties": {
+          "batteryHealth": {
+            "type": "object",
+            "properties": {
+              "soh": {
+                "type": "number",
+                "format": "float",
+                "example": 72.5
+              },
+              "cycleCount": {
+                "type": "integer",
+                "example": 550
+              },
+              "temperature": {
+                "type": "number",
+                "format": "float",
+                "example": 38.2
+              }
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nextMaintenanceDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BatteryRecommendation": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "type": "string",
+            "enum": ["HIGH", "MEDIUM", "LOW"],
+            "example": "HIGH"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["REPLACE", "COOLING", "MONITOR", "RECHARGE"],
+            "example": "REPLACE"
+          },
+          "description": {
+            "type": "string",
+            "example": "Battery replacement recommended within 30 days"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT-based authentication. Use the /auth/login endpoint to obtain a token."
+      },
+      "deviceAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Device-Token",
+        "description": "Device-specific authentication token for telemetry submissions."
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "externalDocs": {
+    "description": "ChargeX Telematics Documentation",
+    "url": "/docs"
+  }
+}

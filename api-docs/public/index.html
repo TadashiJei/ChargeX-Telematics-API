@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChargeX Telematics API Documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <button id="sidebar-toggle" class="sidebar-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="logo-container">
+        <img src="images/logo-light.svg" alt="ChargeX Logo" class="logo">
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="#" class="active">API Reference</a></li>
+          <li><a href="#guides">Guides</a></li>
+          <li><a href="#sdks">SDKs</a></li>
+          <li><a href="#support">Support</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>API Reference</h3>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="#introduction" class="active">Introduction</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li>
+          <span class="menu-section">Endpoints</span>
+          <ul>
+            <li><a href="#tracking">Tracking & Geofencing</a></li>
+            <li><a href="#energy-trading">Energy Trading</a></li>
+            <li><a href="#predictive">Predictive Maintenance</a></li>
+            <li><a href="#telemetry">Telemetry</a></li>
+            <li><a href="#devices">Device Management</a></li>
+            <li><a href="#alerts">Alert System</a></li>
+            <li><a href="#blockchain">Blockchain Integration</a></li>
+            <li><a href="#user-management">User Management</a></li>
+            <li><a href="#caching">Caching Layer</a></li>
+            <li><a href="#rivalz">Rivalz.ai Integration</a></li>
+          </ul>
+        </li>
+        <li><a href="#errors">Errors</a></li>
+        <li><a href="#rate-limits">Rate Limits</a></li>
+      </ul>
+    </div>
+
+    <div class="content">
+      <section id="introduction" class="section">
+        <div class="section-header">
+          <h1>ChargeX Telematics API</h1>
+          <p class="version">Version 1.0.0</p>
+        </div>
+        <p class="description">
+          Welcome to the ChargeX Telematics API documentation. This API provides comprehensive battery tracking, monitoring, and management capabilities for the ChargeX ecosystem.
+        </p>
+        <div class="cards">
+          <div class="card">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+            </div>
+            <h3>Real-time Tracking</h3>
+            <p>Track battery locations and monitor geofence violations in real-time.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+            </div>
+            <h3>Energy Trading</h3>
+            <p>Enable peer-to-peer energy trading between battery owners.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+            <h3>Predictive Maintenance</h3>
+            <p>AI-powered battery health prediction and maintenance recommendations.</p>
+          </div>
+        </div>
+        <div class="api-explorer-btn">
+          <a href="#swagger-ui" class="btn btn-primary">Explore the API</a>
+        </div>
+      </section>
+
+      <section id="authentication" class="section">
+        <div class="section-header">
+          <h2>Authentication</h2>
+        </div>
+        <p class="description">
+          The ChargeX Telematics API uses JWT-based authentication for secure access to API endpoints. Additionally, device-specific token authentication is available for telemetry submissions.
+        </p>
+        <div class="code-example">
+          <h4>Authentication Headers</h4>
+          <pre><code>Authorization: Bearer {your_jwt_token}
+
+# For device authentication
+X-Device-Token: {device_token}</code></pre>
+        </div>
+        <p>The authentication system includes:</p>
+        <ul>
+          <li>JWT-based authentication with refresh tokens</li>
+          <li>Role-based authorization (admin, user, device)</li>
+          <li>Device token authentication for telemetry submissions</li>
+          <li>Password hashing and verification</li>
+        </ul>
+      </section>
+
+      <section id="tracking" class="section">
+        <div class="section-header">
+          <h2>Tracking & Geofencing</h2>
+        </div>
+        <p class="description">
+          The battery tracking system provides real-time location tracking and geofencing capabilities for all batteries in the ChargeX ecosystem.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Real-time tracking of battery locations on an interactive map</li>
+          <li>Detailed battery status monitoring (charge level, temperature, status)</li>
+          <li>Historical location data retrieval</li>
+          <li>Circle-based geofences with configurable radius</li>
+          <li>Haversine formula for accurate distance calculation</li>
+          <li>Battery assignment to specific geofences</li>
+          <li>Real-time violation detection</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/tracking/geofence</code> - For managing geofences</li>
+          <li><code>/api/v1/tracking/geofence/:geofenceId/batteries</code> - For retrieving batteries within geofences</li>
+          <li><code>/api/v1/tracking/violations</code> - For detecting geofence violations</li>
+        </ul>
+      </section>
+
+      <section id="energy-trading" class="section">
+        <div class="section-header">
+          <h2>Energy Trading</h2>
+        </div>
+        <p class="description">
+          The peer-to-peer energy trading platform allows battery owners to sell excess energy to other users in the network.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Energy marketplace with offer creation and management</li>
+          <li>Geolocation-based matching to find nearby energy sources</li>
+          <li>Flexible pricing model with per-kWh pricing</li>
+          <li>Trade management with status tracking</li>
+          <li>Transaction recording and statistics</li>
+          <li>Distance calculation using the Haversine formula</li>
+          <li>Partial purchase support</li>
+        </ul>
+        <h3>Configuration</h3>
+        <p>Energy trading is configured via environment variables:</p>
+        <pre><code>ENABLE_ENERGY_TRADING=true
+ENERGY_TRADING_MIN_PRICE=0.05
+ENERGY_TRADING_MAX_DISTANCE=50</code></pre>
+      </section>
+
+      <section id="predictive" class="section">
+        <div class="section-header">
+          <h2>Predictive Maintenance</h2>
+        </div>
+        <p class="description">
+          AI-powered battery health prediction and maintenance recommendations to optimize battery performance and longevity.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Remaining Useful Life (RUL) predictions for batteries</li>
+          <li>Maintenance recommendations with urgency levels</li>
+          <li>Predictive failure date estimation</li>
+          <li>Confidence scoring for predictions</li>
+          <li>Historical trend analysis</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/predictive/battery/:batteryId/prediction</code> - Get RUL prediction for a battery</li>
+          <li><code>/api/v1/predictive/battery/:batteryId/recommendations</code> - Get maintenance recommendations</li>
+        </ul>
+      </section>
+
+      <section id="telemetry" class="section">
+        <div class="section-header">
+          <h2>Telemetry</h2>
+        </div>
+        <p class="description">
+          Comprehensive telemetry data collection, storage, and analysis for all batteries and devices in the ChargeX ecosystem.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Real-time and batch telemetry submission</li>
+          <li>Time-series data storage with InfluxDB</li>
+          <li>Historical data querying with aggregation</li>
+          <li>Socket.IO real-time updates</li>
+          <li>Metrics include voltage, current, temperature, state of charge, and location</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/telemetry/submit</code> - Submit telemetry data</li>
+          <li><code>/api/v1/telemetry/:deviceId</code> - Get telemetry data for a device</li>
+        </ul>
+      </section>
+
+      <section id="devices" class="section">
+        <div class="section-header">
+          <h2>Device Management</h2>
+        </div>
+        <p class="description">
+          Comprehensive device management capabilities for registering, configuring, and monitoring devices in the ChargeX ecosystem.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Complete device registration and configuration</li>
+          <li>Device status tracking and command interface</li>
+          <li>Device-to-battery association</li>
+          <li>Device metadata management</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/devices</code> - Register and retrieve devices</li>
+          <li><code>/api/v1/devices/:deviceId</code> - Get, update, or delete a specific device</li>
+          <li><code>/api/v1/devices/:deviceId/command</code> - Send a command to a device</li>
+        </ul>
+      </section>
+
+      <section id="alerts" class="section">
+        <div class="section-header">
+          <h2>Alert System</h2>
+        </div>
+        <p class="description">
+          Comprehensive alert system for monitoring battery health, geofence violations, and system events.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Threshold-based alerting for battery metrics</li>
+          <li>Geofence violation detection</li>
+          <li>Alert management (acknowledge, resolve)</li>
+          <li>Alert categorization and severity levels</li>
+          <li>Different alert types (warning, critical, info)</li>
+          <li>Alert resolution workflow</li>
+          <li>Filtering and sorting of alerts</li>
+          <li>Real-time alert notifications</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/alerts</code> - Get all alerts</li>
+          <li><code>/api/v1/alerts/:alertId</code> - Get, update, or delete a specific alert</li>
+          <li><code>/api/v1/alerts/:alertId/acknowledge</code> - Acknowledge an alert</li>
+          <li><code>/api/v1/alerts/:alertId/resolve</code> - Resolve an alert</li>
+        </ul>
+      </section>
+
+      <section id="blockchain" class="section">
+        <div class="section-header">
+          <h2>Blockchain Integration</h2>
+        </div>
+        <p class="description">
+          Blockchain integration for secure device registration and telemetry data logging.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Device registration on blockchain</li>
+          <li>Telemetry data logging with hashing</li>
+          <li>Smart contract interaction</li>
+          <li>Transaction management</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/blockchain/register-device</code> - Register a device on the blockchain</li>
+          <li><code>/api/v1/blockchain/log-telemetry</code> - Log telemetry data on the blockchain</li>
+          <li><code>/api/v1/blockchain/transactions</code> - Get blockchain transactions</li>
+        </ul>
+      </section>
+
+      <section id="user-management" class="section">
+        <div class="section-header">
+          <h2>User Management</h2>
+        </div>
+        <p class="description">
+          Comprehensive user management system for managing user accounts, preferences, and authentication.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Comprehensive user model with preferences</li>
+          <li>Token management and refresh tokens</li>
+          <li>Password reset and email verification</li>
+          <li>Role-based access control</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/auth/register</code> - Register a new user</li>
+          <li><code>/api/v1/auth/login</code> - Login and get JWT token</li>
+          <li><code>/api/v1/auth/refresh</code> - Refresh JWT token</li>
+          <li><code>/api/v1/auth/reset-password</code> - Reset password</li>
+          <li><code>/api/v1/users/:userId</code> - Get, update, or delete a user</li>
+          <li><code>/api/v1/users/:userId/preferences</code> - Get or update user preferences</li>
+        </ul>
+      </section>
+
+      <section id="caching" class="section">
+        <div class="section-header">
+          <h2>Caching Layer</h2>
+        </div>
+        <p class="description">
+          Redis-based caching layer for optimizing performance and managing sessions.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Redis-based caching for configuration and telemetry</li>
+          <li>Session management</li>
+          <li>Performance optimization</li>
+          <li>Cached API responses</li>
+        </ul>
+        <h3>Configuration</h3>
+        <p>Caching is configured via environment variables:</p>
+        <pre><code>REDIS_URL=redis://localhost:6379
+CACHE_TTL=3600
+ENABLE_RESPONSE_CACHE=true</code></pre>
+      </section>
+
+      <section id="rivalz" class="section">
+        <div class="section-header">
+          <h2>Rivalz.ai Integration</h2>
+        </div>
+        <p class="description">
+          Integration with Rivalz.ai for advanced telemetry data analysis and knowledge base creation.
+        </p>
+        <h3>Key Features</h3>
+        <ul>
+          <li>Knowledge base creation from telemetry data</li>
+          <li>Natural language querying of telemetry data</li>
+          <li>Advanced analytics and insights</li>
+        </ul>
+        <h3>API Endpoints</h3>
+        <ul>
+          <li><code>/api/v1/rivalz/device/:deviceId/knowledge-base</code> - Create a knowledge base</li>
+          <li><code>/api/v1/rivalz/query</code> - Query the knowledge base</li>
+        </ul>
+      </section>
+
+      <section id="errors" class="section">
+        <div class="section-header">
+          <h2>Errors</h2>
+        </div>
+        <p class="description">
+          The ChargeX Telematics API uses conventional HTTP response codes to indicate the success or failure of an API request.
+        </p>
+        <table class="error-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>200 - OK</td>
+              <td>Everything worked as expected.</td>
+            </tr>
+            <tr>
+              <td>201 - Created</td>
+              <td>A new resource was successfully created.</td>
+            </tr>
+            <tr>
+              <td>400 - Bad Request</td>
+              <td>The request was unacceptable, often due to missing a required parameter.</td>
+            </tr>
+            <tr>
+              <td>401 - Unauthorized</td>
+              <td>No valid API key provided.</td>
+            </tr>
+            <tr>
+              <td>403 - Forbidden</td>
+              <td>The API key doesn't have permissions to perform the request.</td>
+            </tr>
+            <tr>
+              <td>404 - Not Found</td>
+              <td>The requested resource doesn't exist.</td>
+            </tr>
+            <tr>
+              <td>429 - Too Many Requests</td>
+              <td>Too many requests hit the API too quickly.</td>
+            </tr>
+            <tr>
+              <td>500, 502, 503, 504 - Server Errors</td>
+              <td>Something went wrong on ChargeX's end.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="rate-limits" class="section">
+        <div class="section-header">
+          <h2>Rate Limits</h2>
+        </div>
+        <p class="description">
+          The ChargeX Telematics API implements rate limiting to ensure the stability and availability of the service for all users.
+        </p>
+        <p>Rate limits are applied on a per-API key basis. If you exceed the rate limit, the API will return a 429 Too Many Requests response.</p>
+        <table class="rate-limit-table">
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Rate Limit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Authentication endpoints</td>
+              <td>10 requests per minute</td>
+            </tr>
+            <tr>
+              <td>Telemetry submission</td>
+              <td>100 requests per minute per device</td>
+            </tr>
+            <tr>
+              <td>All other endpoints</td>
+              <td>60 requests per minute</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="swagger-ui" class="swagger-section"></section>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="images/logo-light.svg" alt="ChargeX Logo" class="logo" style="height: 80px;">
+          <p>Comprehensive battery tracking, monitoring, and management capabilities.</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>API</h4>
+            <ul>
+              <li><a href="#introduction">Introduction</a></li>
+              <li><a href="#authentication">Authentication</a></li>
+              <li><a href="#errors">Errors</a></li>
+              <li><a href="#rate-limits">Rate Limits</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Endpoints</h4>
+            <ul>
+              <li><a href="#tracking">Tracking & Geofencing</a></li>
+              <li><a href="#energy-trading">Energy Trading</a></li>
+              <li><a href="#predictive">Predictive Maintenance</a></li>
+              <li><a href="#telemetry">Telemetry</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Features</h4>
+            <ul>
+              <li><a href="#devices">Device Management</a></li>
+              <li><a href="#alerts">Alert System</a></li>
+              <li><a href="#blockchain">Blockchain Integration</a></li>
+              <li><a href="#user-management">User Management</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <ul>
+              <li><a href="#contact">Contact</a></li>
+              <li><a href="#status">Status</a></li>
+              <li><a href="#faq">FAQ</a></li>
+              <li><a href="#community">Community</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 ChargeX. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5.0.0/swagger-ui-bundle.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
