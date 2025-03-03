@@ -12,6 +12,8 @@ DOCS_PORT=3050
 INSTALL_DIR="/var/www/chargex-telematics"
 ENABLE_SSL=true
 SETUP_FIREWALL=true
+USE_IP_INSTEAD_OF_DOMAIN=false
+SERVER_IP="$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')"
 
 # Colors for better readability
 GREEN="\033[0;32m"
@@ -39,11 +41,18 @@ print_section() {
 
 # Function to check command success
 check_success() {
+    local critical=${2:-true}
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓ Success: $1${NC}"
+        return 0
     else
-        echo -e "\033[0;31m✗ Error: $1 failed. Please check the output above for details.${NC}"
-        exit 1
+        if [ "$critical" = true ]; then
+            echo -e "\033[0;31m✗ Error: $1 failed. Please check the output above for details.${NC}"
+            exit 1
+        else
+            echo -e "\033[0;33m⚠ Warning: $1 failed, but continuing deployment.${NC}"
+            return 1
+        fi
     fi
 }
 
@@ -168,9 +177,49 @@ fi
 
 # 7. Configure Nginx
 print_section "Configuring Nginx"
-echo "Creating Nginx configuration..."
 
-NGINX_CONF="server {
+# Ask if we should use IP address instead of domains
+echo -e "${YELLOW}Do you want to use the server IP address instead of domain names?${NC}"
+echo -e "${YELLOW}This is useful for testing when you don't have domain names configured.${NC}"
+read -p "Use IP address? (y/n) [default: n]: " USE_IP_RESPONSE
+if [[ "$USE_IP_RESPONSE" =~ ^[Yy]$ ]]; then
+    USE_IP_INSTEAD_OF_DOMAIN=true
+    echo -e "${GREEN}Using server IP address: $SERVER_IP${NC}"
+    
+    # Configure for IP-based access
+    APP_LOCATION="/"
+    DOCS_LOCATION="/docs/"
+    
+    NGINX_CONF="server {
+    listen 80;
+    server_name $SERVER_IP;
+
+    location $APP_LOCATION {
+        proxy_pass http://localhost:$APP_PORT/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+
+    location $DOCS_LOCATION {
+        proxy_pass http://localhost:$DOCS_PORT/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}"
+
+    # Disable SSL for IP-based setup
+    ENABLE_SSL=false
+    echo -e "${YELLOW}SSL has been disabled for IP-based setup.${NC}"
+else
+    echo "Creating domain-based Nginx configuration..."
+    
+    NGINX_CONF="server {
     listen 80;
     server_name $APP_DOMAIN;
 
@@ -197,6 +246,7 @@ server {
         proxy_cache_bypass \$http_upgrade;
     }
 }"
+fi
 
 echo "$NGINX_CONF" | $SUDO tee /etc/nginx/sites-available/chargex-telematics > /dev/null
 $SUDO ln -sf /etc/nginx/sites-available/chargex-telematics /etc/nginx/sites-enabled/
@@ -220,13 +270,25 @@ if [ "$ENABLE_SSL" = true ]; then
     echo -e "${YELLOW}Note: This will only work if your domain is properly configured to point to this server.${NC}"
     echo -e "${YELLOW}If you're testing, you may want to use the --staging flag with certbot.${NC}"
     
-    read -p "Do you want to proceed with SSL setup? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        $SUDO certbot --nginx -d $APP_DOMAIN -d $DOCS_DOMAIN
-        check_success "SSL certificate installation"
-    else
+    echo -e "${YELLOW}SSL setup requires an email address for certificate renewal notifications.${NC}"
+    read -p "Enter your email address (or type 'skip' to skip SSL setup): " EMAIL_ADDRESS
+    
+    if [[ "$EMAIL_ADDRESS" == "skip" ]]; then
         echo -e "${YELLOW}SSL setup skipped. You can run certbot manually later.${NC}"
+    else
+        if [[ "$EMAIL_ADDRESS" == "" ]]; then
+            echo -e "${YELLOW}No email provided. Using --register-unsafely-without-email option.${NC}"
+            echo -e "${YELLOW}WARNING: This is not recommended for production use.${NC}"
+            $SUDO certbot --nginx --register-unsafely-without-email --agree-tos -d $APP_DOMAIN -d $DOCS_DOMAIN || {
+                echo -e "${YELLOW}SSL setup failed. Continuing without SSL.${NC}"
+                # Don't exit on SSL failure, just continue
+            }
+        else
+            $SUDO certbot --nginx --email "$EMAIL_ADDRESS" --agree-tos -d $APP_DOMAIN -d $DOCS_DOMAIN || {
+                echo -e "${YELLOW}SSL setup failed. Continuing without SSL.${NC}"
+                # Don't exit on SSL failure, just continue
+            }
+        fi
     fi
 fi
 
@@ -304,10 +366,19 @@ echo -e "${YELLOW}  sudo systemctl start chargex-telematics.service${NC}"
 print_section "Deployment Complete"
 echo -e "${GREEN}ChargeX Telematics has been successfully deployed!${NC}"
 echo ""
-echo -e "${BLUE}Main application:${NC} http://$APP_DOMAIN"
-echo -e "${BLUE}API documentation:${NC} http://$DOCS_DOMAIN"
+
+if [ "$USE_IP_INSTEAD_OF_DOMAIN" = true ]; then
+    echo -e "${BLUE}Access your application at:${NC}"
+    echo -e "  Main application: http://$SERVER_IP$APP_LOCATION"
+    echo -e "  API documentation: http://$SERVER_IP$DOCS_LOCATION"
+else
+    echo -e "${BLUE}Access your application at:${NC}"
+    echo -e "  Main application: http://$APP_DOMAIN"
+    echo -e "  API documentation: http://$DOCS_DOMAIN"
+fi
+
 echo ""
-echo -e "${BLUE}Local access:${NC}"
+echo -e "${BLUE}Local access (from the server):${NC}"
 echo -e "  Main application: http://localhost:$APP_PORT"
 echo -e "  API documentation: http://localhost:$DOCS_PORT"
 echo ""
