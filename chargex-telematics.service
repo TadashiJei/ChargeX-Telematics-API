@@ -1,0 +1,15 @@
+[Unit]
+Description=ChargeX Telematics API Service
+After=network.target mongodb.service redis.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ChargeX-Telematics
+ExecStart=/usr/bin/node src/server.js
+Restart=on-failure
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
