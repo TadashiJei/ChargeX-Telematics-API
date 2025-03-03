@@ -158,21 +158,86 @@ cd ..
 
 # 6. Configure environment
 print_section "Configuring Environment"
-if [ ! -f ".env" ]; then
-    echo "Creating .env file from example..."
+
+# Check for environment files in order of preference
+if [ -f ".env.production" ]; then
+    echo "Found .env.production, using for deployment..."
+    cp .env.production .env
+    ENV_SOURCE="production"
+elif [ -f ".env.example" ]; then
+    echo "Found .env.example, copying to .env..."
     cp .env.example .env
-    
-    # Generate random JWT secret
-    JWT_SECRET=$(openssl rand -hex 32)
-    sed -i "s/JWT_SECRET=your_jwt_secret_key/JWT_SECRET=$JWT_SECRET/g" .env
-    
-    # Set production environment
-    sed -i "s/NODE_ENV=development/NODE_ENV=production/g" .env
-    
+    ENV_SOURCE="example"
+else
+    echo -e "${YELLOW}No environment template found. Creating basic .env file...${NC}"
+    cat > .env << EOL
+# Server Configuration
+PORT=3000
+NODE_ENV=production
+
+# Database Configuration
+MONGODB_URI=mongodb://localhost:27017/chargex-telematics
+
+# JWT Authentication
+JWT_SECRET=placeholder_jwt_secret
+
+# Feature Flags
+ENABLE_ENERGY_TRADING=true
+ENABLE_GEOFENCING=true
+USE_MOCK_DATA=false
+EOL
+    ENV_SOURCE="basic"
+fi
+
+# Generate secure random keys
+echo "Generating secure keys..."
+
+# Generate random JWT secret
+JWT_SECRET=$(openssl rand -hex 32)
+sed -i "s|JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|g" .env
+
+# Generate random encryption key if present in file
+if grep -q "ENCRYPTION_KEY" .env; then
+    ENCRYPTION_KEY=$(openssl rand -base64 32)
+    sed -i "s|ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$ENCRYPTION_KEY|g" .env
+fi
+
+# Ensure production environment
+sed -i "s|NODE_ENV=.*|NODE_ENV=production|g" .env
+
+# Ask for MongoDB URI
+echo -e "${YELLOW}Do you want to configure MongoDB connection?${NC}"
+read -p "Enter MongoDB URI (leave empty to use default): " MONGO_URI
+if [ ! -z "$MONGO_URI" ]; then
+    # Replace MongoDB URI in .env file
+    sed -i "s|MONGODB_URI=.*|MONGODB_URI=$MONGO_URI|g" .env
+    echo -e "${GREEN}MongoDB URI updated.${NC}"
+fi
+
+# Inform user about environment setup
+echo -e "${GREEN}Environment configuration complete using $ENV_SOURCE template.${NC}"
+echo -e "${YELLOW}You can edit additional settings in $INSTALL_DIR/.env${NC}"
+
     check_success "Environment configuration"
-    echo -e "${YELLOW}Note: Please review and update the .env file with your specific settings.${NC}"
 else
     echo -e "${GREEN}✓ .env file already exists${NC}"
+    echo -e "${YELLOW}Note: You may want to review and update the existing .env file.${NC}"
+    
+    # Ask if user wants to regenerate secure keys in existing .env
+    read -p "Do you want to regenerate secure keys in the existing .env file? (y/n) [default: n]: " REGEN_KEYS
+    if [[ "$REGEN_KEYS" =~ ^[Yy]$ ]]; then
+        # Generate random JWT secret
+        JWT_SECRET=$(openssl rand -hex 32)
+        sed -i "s|JWT_SECRET=.*|JWT_SECRET=$JWT_SECRET|g" .env
+        
+        # Generate random encryption key if present in file
+        if grep -q "ENCRYPTION_KEY" .env; then
+            ENCRYPTION_KEY=$(openssl rand -base64 32)
+            sed -i "s|ENCRYPTION_KEY=.*|ENCRYPTION_KEY=$ENCRYPTION_KEY|g" .env
+        fi
+        
+        echo -e "${GREEN}Secure keys regenerated.${NC}"
+    fi
 fi
 
 # 7. Configure Nginx
